@@ -16,7 +16,7 @@ for i in range(T): # 테스트케이스만큼 반복
                 buf_1 = s[start + 1:end + 1] # 시작 인덱스의 다음 인덱스부터 끝인덱스까지 하나
                 buf_2 = s[start:end] # 시작 인덱스부터 끝 인덱스의 이전 인덱스까지 하나
                 if buf_1 == buf_1[::-1] or buf_2 == buf_2[::-1]: # 둘 중 하나라도 회문이라면
-                    print(1) # 1 출력 후 
+                    print(1) # 1 출력 후  
                     break # while문 탈출
                 else: # 둘 다 아니면
                     print(2) # 2 출력 후
