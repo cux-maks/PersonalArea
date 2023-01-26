@@ -1,76 +1,85 @@
+import sys
 from collections import deque
-import sys; input = sys.stdin.readline
 
-sys.setrecursionlimit(10**8)
+input = sys.stdin.readline
 
-R, C = map(int, input().rstrip().split())
-grid = [list(input().rstrip()) for _ in range(R)]
-root = [[(i, j) for j in range(C)] for i in range(R)]
-rank = [[0 for _ in range(C)] for _ in range(R)]
-visited = [[False for _ in range(C)] for _ in range(R)]
-L_locate = []
-dx = [0, 0, 1, -1]
-dy = [1, -1, 0, 0]
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
+
+N, M = map(int, input().rstrip().split())
+
+grid = [list(input()) for _ in range(N)]
+root = [[(i, j) for j in range(M)] for i in range(N)]
+visit = [[False for _ in range(M)] for _ in range(N)]
+swan = []
+
+def in_range(x, y):
+    return (0 <= x < N and 0 <= y < M)
 
 def find(x, y):
-    if x == root[x][y]:
-        return x
+    if (x, y) == root[x][y]:
+        return (x, y)
     root[x][y] = find(root[x][y][0], root[x][y][1])
-    return root[x][y][0], root[x][y][1]
+    return root[x][y]
 
 def union(x1, y1, x2, y2):
-    r10, r11 = find(x1, y1)
-    r20, r21 = find(x2, y2)
+    x1, y1 = find(x1, y1)
+    x2, y2 = find(x2, y2)
+    root[x2][y2] = (x1, y1)
 
-    if rank[r10][r11] > rank[r20][r21]: root[r20][r21] = (r10, r11)
-    elif rank[r20][r21] > rank[r10][r11]: root[r10][r11] = (r20, r21)
-    else:
-        root[r20][r21] = (r10, r11)
-        rank[r10][r11] += 1
+def bfs(melt):
+    buf = deque()
+    while melt:
+        x, y = melt.popleft()
+        grid[x][y] = "."
+        union_list = []
+        for k in range(4):
+            nx = x + dx[k]
+            ny = y + dy[k]
+            if in_range(nx, ny) and not visit[nx][ny] and grid[nx][ny] == "X":
+                visit[nx][ny] = True
+                buf.append((nx, ny))
+            elif in_range(nx, ny) and grid[nx][ny] == ".":
+                union_list.append((nx, ny))
+        for a in union_list:
+            bx, by = a[0], a[1]
+            if find(bx, by) != find(x, y):
+                union(bx, by, x, y)
+    return buf
 
 
-for i in range(R):
-    for j in range(C):
-        if grid[i][j] == 'L':
-            L_locate.append((i, j))
-            grid[i][j] = '.'
-            if len(L_locate) == 2: break
+for i in range(N):
+    for j in range(M):
+        if grid[i][j] == "L":
+            swan.append((i, j))
+            grid[i][j] = "."
+            if len(swan) == 2:
+                break
 
-ice = deque()
-for i in range(R):
-    for j in range(C):
-        if not visited[i][j] and grid[i][j] == '.':
+
+melt = deque()
+for i in range(N):
+    for j in range(M):
+        if not visit[i][j] and grid[i][j] == ".":
             q = deque()
             q.append((i, j))
-            visited[i][j] = True
+            visit[i][j] = 1
             while q:
-                y, x = q.popleft()
+                x, y = q.popleft()
+                root[x][y] = (i, j)
                 for k in range(4):
-                    nx, ny = x + dx[k], y + dy[k]
-                    if 0 <= nx < R and 0 <= ny < C and (not visited[nx][ny]) and grid[nx][ny] == '.':
-                        visited[nx][ny] = True
+                    ny, nx = y + dy[k], x + dx[k]
+                    if in_range(nx, ny) and not visit[nx][ny] and grid[nx][ny] == ".":
+                        visit[nx][ny] = True
                         q.append((nx, ny))
-                    elif 0 <= nx < R and 0 <= ny < C and (not visited[nx][ny]) and grid[nx][ny] == 'X':
-                        visited[nx][ny] = True
-                        ice.append((nx, ny))
+                    elif in_range(nx, ny) and not visit[nx][ny] and grid[nx][ny] == "X":
+                        visit[nx][ny] = True
+                        melt.append((nx, ny))
 
-result = 0
-while find(L_locate[0][0], L_locate[0][1]) != find(L_locate[1][0], L_locate[1][1]):
-    tmp = deque()
-    while ice:
-        x, y = ice.popleft()
-        grid[x][y] = '.'
-        mp = []
-        for i in range(4):
-            nx, ny = x + dx[i], y + dy[i]
-            if 0 <= nx < R and 0 <= ny < C and (not visited[nx][ny]) and grid[nx][ny] == 'X':
-                visited[nx][ny] = True
-                tmp.append((nx, ny))
-            elif 0 <= nx < R and 0 <= ny < C and grid[nx][ny] == '.':
-                mp.append((nx, ny))
-        for rt in mp:
-            if find(rt[0], rt[1]) != find(x, y): union(rt[0], rt[1], x, y)
-    ice = tmp
-    result += 1
 
-print(result)
+day = 0
+while find(swan[0][0], swan[0][1]) != find(swan[1][0], swan[1][1]):
+    melt = bfs(melt)
+    day += 1
+
+print(day)
