@@ -7,7 +7,7 @@ def mul(L, M):
     for i in range(2):
         for j in range(2):
             for k in range(2):
-                result[i][j] += (L[i][k] * M[k][j]) % 1000000007
+                result[i][j] += (L[i][k] * M[k][j]) % 1000000
     return result
 
 def fibo_pow(x, y): 
@@ -19,4 +19,4 @@ def fibo_pow(x, y):
 
 ans = fibo_pow(m, N)
 
-print(ans[0][1] % 1000000007)
+print(ans[0][1] % 1000000)
