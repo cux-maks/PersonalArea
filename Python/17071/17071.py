@@ -1,36 +1,31 @@
-N, K = map(int, input().split())
+import sys
+input = sys.stdin.readline
 
-time = 1
-move = [[-1, -1] for _ in range(500001)]
-move[N][0] = 0
-points = set([N])
+MAX = 500001
+N, K = map(int, input().rstrip().split())
 
-if N != K:
-    while K < 500001:
+def possible(x):
+    return 0 <= x < MAX
 
-        n_points = set()
-        for subin in points:
-            for nxt in (subin-1, subin+1, subin*2):
-                if -1 < nxt < 500001:
-                    flag = time % 2
-                    if move[nxt][flag] < 0:
-                        move[nxt][flag] = time
-                        n_points.add(nxt)
-
-        points = n_points
-
-        K += time
-        if K < 500001:
-            flag = time % 2
-            
-            if move[K][flag] > -1:
-                break           
-
-            time += 1
+visited = [[-1 for _ in range(2)] for _ in range(MAX)]
+if N == K: print(0)
 else:
-    time = 0
-
-if K < 500001:
-    print(time)
-else:
-    print(-1)
+    q = [N]
+    t = 1
+    K += 1
+    while True:
+        if K >= MAX:
+            print(-1)
+            break
+        buf = []
+        for x in q:
+            for nx in [x + 1, x - 1, x * 2]:
+                if possible(nx) and visited[nx][t % 2] == -1:
+                    buf.append(nx)
+                    visited[nx][t % 2] = t
+        if visited[K][t % 2] != -1:
+            print(t)
+            break
+        t += 1
+        K += t
+        q = buf
