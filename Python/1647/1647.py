@@ -27,7 +27,6 @@ m = 0
 for i in range(M):
     c, a, b = graph[i]
     if find(parent, a) != find(parent, b):
-        print("test", c, a, b)
         union(parent, a, b)
         result += c
         m = max(m, c)
