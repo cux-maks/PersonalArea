@@ -22,9 +22,7 @@ for l, n in player:
 for x in room:
     if len(x) == m:
         print("Started!")
-        x.sort(key = lambda a: a[1])
-        for l, n in x: print(l, n)
     else:
         print("Waiting!")
-        x.sort(key = lambda a: a[1])
-        for l, n in x: print(l, n)
+    x.sort(key = lambda a: a[1])
+    for l, n in x: print(l, n)
